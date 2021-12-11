@@ -26,7 +26,13 @@ export async function asyncGetUsers(offset = 0): Promise<string[]> {
 
 export const internalState = atom<string[]>({
   key: "users",
-  default: [],
+  default: selector({
+    key: "users/default",
+    get: async ({ get }) => {
+      const getUsers = await asyncGetUsers();
+      return getUsers;
+    },
+  }),
 });
 
 export const list = selector<string[]>({
@@ -37,22 +43,14 @@ export const list = selector<string[]>({
   },
 });
 
-export const state = selector<string[]>({
-  key: "users/state",
-  get: async ({ get }) => {
-    const currentUsers = get(internalState);
-    const getUsers = await asyncGetUsers(currentUsers.length);
-    console.log("getttererreer");
+// export const state = selector<string[]>({
+//   key: "users/state",
+//   get: async ({ get }) => {
+//     const currentUsers = get(internalState);
+//     const getUsers = await asyncGetUsers(currentUsers.length);
+//     console.log("getttererreer");
 
-    // return [...currentUsers, ...getUsers];
-    return getUsers;
-  },
-  set: ({ set }, getUsers) => {
-    set(internalState, (currentUsers) => {
-      console.log("currentUsers!!!!", currentUsers);
-      console.log("getUsers!!!!", getUsers);
-
-      return [...currentUsers, ...(getUsers as string[])];
-    });
-  },
-});
+//     // return [...currentUsers, ...getUsers];
+//     return getUsers;
+//   },
+// });

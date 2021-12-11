@@ -5,10 +5,10 @@ import {
   useRecoilStateLoadable,
   useRecoilCallback,
 } from "recoil";
-import { list, state, asyncGetUsers, internalState } from "./atom";
+import { asyncGetUsers, internalState } from "./atom";
 
 export const Users = () => {
-  const [loadable, setUsers] = useRecoilStateLoadable(state);
+  const [loadable, setUsers] = useRecoilStateLoadable(internalState);
   // const userList = useRecoilValue(list);
   console.log("loadable!!!!!!!", loadable);
 
@@ -18,20 +18,21 @@ export const Users = () => {
   //   }
   // }, [usersState]);
 
-  const loadMore = async () => {
-    console.log("click");
-    const getUsers = await asyncGetUsers(loadable.contents.length);
-    setUsers(getUsers);
-  };
-
-  // const setUsers = useRecoilCallback(({ set }) => async () => {
+  // const loadMore = async () => {
+  //   console.log("click");
   //   const getUsers = await asyncGetUsers(loadable.contents.length);
-  //   console.log("getUsers", getUsers);
-  //   set(internalState, (users) => {
-  //     console.log(users, getUsers);
-  //     return [...users, ...getUsers];
-  //   });
-  // });
+  //   setUsers(getUsers);
+  // };
+
+  const loadMore = useRecoilCallback(({ set }) => async () => {
+    const getUsers = await asyncGetUsers(loadable.contents.length);
+    set(internalState, (users) => {
+      console.log("currentUser", users);
+      console.log("getUsers", getUsers);
+
+      return [...users, ...getUsers];
+    });
+  });
 
   switch (loadable.state) {
     case "hasValue":
